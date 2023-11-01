@@ -1,3 +1,4 @@
+from re import match
 from lpp.token import (
     Token,
     TokenType,
@@ -14,7 +15,27 @@ class Lexer:
         self._read_character()
 
     def next_token(self) -> Token:
-        token = Token(TokenType.ILLEGAL, self._character)
+        token_dict = {
+            "^=$": TokenType.ASSIGN,
+            "^\+$": TokenType.PLUS,
+            "^\($": TokenType.LPAREN,
+            "^\)$": TokenType.RPAREN,
+            "^{$": TokenType.LBRACE,
+            "^}$": TokenType.RBRACE,
+            "^,$": TokenType.COMMA,
+            "^;$": TokenType.SEMICOLON,
+            "^$": TokenType.EOF,
+        }
+        token = None
+
+        for regex, token_type in token_dict.items():
+            if match(regex, self._character):
+                token = Token(token_type, self._character)
+                break
+        
+        if token is None:
+            token = Token(TokenType.ILLEGAL, self._character)
+
         self._read_character()
 
         return token
